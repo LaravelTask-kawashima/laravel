@@ -9,13 +9,13 @@
             <div class="alert alert-success">{{session('message')}}</div>
             @endif
 
-            <form method="p" action="{{route('post.update',$post)}}" enctype="multipart/form-data">
+            <form method="post" action="{{route('post.update',$post)}}" enctype="multipart/form-data">
                 @csrf
                 @method('put')
                 <div class="form-group">
                     <label for="title">件名</label>
                     <input type="text" name="title" class="form-control" 
-                    value="{{old('title', $post->title)}}" id="title" placeholder="Enter Title">
+                    value="{{old('title', $post->title)}}" id="title" placeholder="タイトルを入力してください">
                 </div>
 
                 <div class="form-group">

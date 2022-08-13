@@ -3,9 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\CommentStoreRequest;
+use App\Http\Requests\CommentUpdateRequest;
 use App\Models\Comment;
-use App\Models\Post;
-use Illuminate\Http\Request;
 
 class CommentController extends Controller
 {
@@ -18,34 +17,36 @@ class CommentController extends Controller
     {
         Comment::create([
             "comment"=> $request["comment"],
-            "post_id" => $request->post_id,
+            "post_id" => $request["post_id"],
             "user_id" => auth()->user()->id
         ]);
         return back();
     }
 
+    /**
+     * コメントの編集画面表示
+     * @param  \Illuminate\Http\Comment $request
+     * @return \Illuminate\Http\Response
+     */
     public function edit(Comment $comment)
     {
         return view('comment.edit', compact('comment'));
     }
 
     /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
+     * コメントの編集
+     * @param  \Illuminate\Http\CommentUpdateRequest  $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(CommentUpdateRequest $request, $id)
     {
-        $comment = Comment::find($id);
-        $comment->update($request->only(["comment"]));
+        Comment::edit($request,$id);
         return back()->with('message', 'コメントを更新しました');
     }
 
     /**
-     * Remove the specified resource from storage.
-     *
+     * コメント削除
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */

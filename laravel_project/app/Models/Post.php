@@ -5,17 +5,17 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+
 class Post extends Model
 {
     use HasFactory;
 
     protected $table = "posts";
 
-    protected $fillable = 
+    protected $fillable =
     [
         "title",
         "body",
-        "image",
         "user_id"
     ];
 
@@ -27,5 +27,22 @@ class Post extends Model
     public function comments()
     {
         return $this->hasMany("App\Models\Comment");
+    }
+
+    public function edit($inputs, $post)
+    {
+        $post->title = $inputs['title'];
+        $post->body = $inputs['body'];
+        $post->update();
+        return true;
+    }
+
+    public function store($request)
+    {
+        $this->user_id = auth()->user()->id;
+        $this->title = $request["title"];
+        $this->body = $request["body"];
+        $this->save();
+        return true;
     }
 }

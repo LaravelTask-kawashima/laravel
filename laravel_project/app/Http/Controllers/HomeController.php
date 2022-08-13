@@ -2,49 +2,54 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Comment;
-use Illuminate\Pagination\Paginator;
-use Illuminate\Http\Request;
+use App\Interfaces\CommentRepositoryInterface;
+use App\Interfaces\PostRepositoryInterface;
 use App\Models\Post;
-use Illuminate\Support\Facades\DB;
 
 class HomeController extends Controller
 {
+    private PostRepositoryInterface $postRepository;
+
     /**
-     * Create a new controller instance.
-     *
-     * @return void
+     * 
+     * @return view(home)
      */
-    public function __construct()
+    public function __construct(PostRepositoryInterface $postRepository,CommentRepositoryInterface $commentRepository) 
     {
         $this->middleware('auth');
+        $this->postRepository = $postRepository;
+        $this->commentRepository = $commentRepository;
     }
 
     /**
-     * Show the application dashboard.
-     *
-     * @return \Illuminate\Contracts\Support\Renderable
+     * 投稿データ取得
+     * @return view(home)
      */
     public function index()
     {
-        
-        $posts = Post::orderBy("created_at", "desc")->paginate(5);
+        $posts = $this->postRepository->getAllPosts();
         $user = auth()->user();
         $total_posts = Post::get();
-        return View('home',compact("posts","user","total_posts"));
+        return View('home', compact("posts", "user", "total_posts"));
     }
 
+    /**
+     * ログインユーザーの投稿を取得
+     * @return view(mypost)
+     */
     public function mypost()
     {
-        $user = auth()->user()->id;
-        $posts = Post::where("user_id",$user)->orderBy('created_at', 'desc')->paginate(5);
-        return View("mypost",compact("posts"));
+        $posts = $this->postRepository->getMyPosts();
+        return View("mypost", compact("posts"));
     }
 
+    /**
+     * ログインユーザーのコメントを取得
+     * @return view(mycomment)
+     */
     public function mycomment()
     {
-        $user = auth()->user()->id;
-        $comments = Comment::where("user_id",$user)->orderBy("created_at", "desc")->paginate(5);
-        return View("mycomment",compact("comments"));
+        $comments = $this->commentRepository->getMyComments();
+        return View("mycomment", compact("comments"));
     }
 }

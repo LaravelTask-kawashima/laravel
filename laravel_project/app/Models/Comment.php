@@ -5,6 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * @property-read User $user
+ */
 class Comment extends Model
 {
     use HasFactory;
@@ -26,5 +29,11 @@ class Comment extends Model
     public function user()
     {
         return $this->belongsTo("App\Models\User");
+    }
+
+    static public function edit($request , $id)
+    {
+        $comment = Comment::find($id);
+        $comment->update($request->only(["comment"]));
     }
 }

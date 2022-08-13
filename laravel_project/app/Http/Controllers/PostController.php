@@ -5,11 +5,17 @@ namespace App\Http\Controllers;
 use App\Http\Requests\PostStoreRequest;
 use App\Http\Requests\PostUpdateRequest;
 use App\Models\Post;
-use Illuminate\Http\Request;
-
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class PostController extends Controller
 {
+
+    public function __construct(Post $post)
+    {
+        $this->post = $post;
+    }
     /**
      * Display a listing of the resource.
      *
@@ -22,7 +28,7 @@ class PostController extends Controller
 
     /**
      * 新規投稿ページを表示
-     * @return view("post.create")
+     * @return \Illuminate\Http\Response
      */
     public function create()
     {
@@ -30,27 +36,32 @@ class PostController extends Controller
     }
 
     /**
-     * 新規投稿ページからのレスポンスをDBに保存
+     * 新規投稿ページからのリクエストをDBに保存
      * @param  PostStoreRequest $request
-     * @return view("post.create"),message
+     * @return \Illuminate\Http\Response
      */
     public function store(PostStoreRequest $request)
     {
-        $post = new Post();
-        $post->user_id = auth()->user()->id;
-        $post->fill($request->all())->save();
+        try {
+            $this->post->store($request);
+        } catch (ModelNotFoundException $e) {
+            Log::error($e);
+            back()->with("message", "投稿失敗しました。");
+        }
         return back()->with("message", "投稿完了しました。");
     }
 
     /**
      * 投稿の詳細表示
      * @param  int  $id
-     * @return view("post.show"),post
+     * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(int $id)
     {
-        $post = Post::find($id);
-        if(is_null($post)){
+        try {
+            $post = Post::findOrFail($id);
+        } catch (ModelNotFoundException $e) {
+            Log::error($e);
             return redirect()->route('home')->with('message', '表示する投稿がありません');
         }
         return view("post.show", compact("post"));
@@ -58,7 +69,8 @@ class PostController extends Controller
 
     /**
      * 投稿編集画面の表示
-     * @param  Post  $post
+     * 
+     * @param  App\Models\Post  $post
      * @return \Illuminate\Http\Response
      */
     public function edit(Post $post)
@@ -68,23 +80,23 @@ class PostController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * 投稿内容編集
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param  App\Http\Requests\PostUpdateRequest  $inputs
+     * @param  App\Models\Post $post
      * @return \Illuminate\Http\Response
      */
     public function update(PostUpdateRequest $inputs, Post $post)
     {
         $this->authorize('update', $post);
-        $post->fill($inputs->all())->save();
+        $this->post->edit($inputs, $post);
         return back()->with('message', '投稿を更新しました');
     }
 
     /**
-     * Remove the specified resource from storage.
+     * 投稿削除
      *
-     * @param  int  $id
+     * @param  App\Models\Post $post
      * @return \Illuminate\Http\Response
      */
     public function destroy(Post $post)

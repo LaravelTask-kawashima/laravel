@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\RegisterRequest;
 use App\Mail\RegisterMail;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Validation\Rule;
+
 
 class RegisterController extends Controller
 {
@@ -16,11 +16,14 @@ class RegisterController extends Controller
         return view("auth.pre_register");
     }
 
-    public function register(Request $request)
+    /**
+     * 新規ユーザーの仮登録
+     * @param  RegisterRequest $request
+     * @return \Illuminate\Http\Response
+     */
+
+    public function register(RegisterRequest $request)
     {
-        $request->validate([
-            "email" => ["required" , "email:filter", Rule::unique("users")],
-        ]);
         $email = $request["email"];
         Mail::send(new RegisterMail($email));
         return view("auth.mail_verify");
