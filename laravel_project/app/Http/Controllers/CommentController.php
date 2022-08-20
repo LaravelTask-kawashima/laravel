@@ -5,54 +5,54 @@ namespace App\Http\Controllers;
 use App\Http\Requests\CommentStoreRequest;
 use App\Http\Requests\CommentUpdateRequest;
 use App\Models\Comment;
+use Illuminate\Support\Facades\Lang;
+use Symfony\Component\HttpFoundation\Response;
 
 class CommentController extends Controller
 {
     /**
      * 投稿に対するコメント投稿
      * @param  CommentStoreRequest $request
-     * @return void
+     * @return \Illuminate\Http\Response json
      */
     public function store(CommentStoreRequest $request)
     {
-        Comment::create([
-            "comment"=> $request["comment"],
-            "post_id" => $request["post_id"],
-            "user_id" => auth()->user()->id
-        ]);
-        return back();
-    }
-
-    /**
-     * コメントの編集画面表示
-     * @param  \Illuminate\Http\Comment $request
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Comment $comment)
-    {
-        return view('comment.edit', compact('comment'));
+        $data = Comment::make($request);
+        if ($data) {
+            return response()->json([
+                "data" => $data
+            ], Response::HTTP_OK);
+        }
     }
 
     /**
      * コメントの編集
      * @param  \Illuminate\Http\CommentUpdateRequest  $request
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\Response json
      */
     public function update(CommentUpdateRequest $request, $id)
     {
-        Comment::edit($request,$id);
-        return back()->with('message', 'コメントを更新しました');
+        $data = Comment::edit($request, $id);
+        if ($data) {
+            return response()->json([
+                "data" => $data
+            ], Response::HTTP_OK);
+        }
     }
 
     /**
      * コメント削除
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param  \Illuminate\Http\Comment $comment
+     * @return \Illuminate\Http\Response json
      */
     public function destroy(Comment $comment)
     {
-        $comment->delete();
-        return back()->with('message', 'コメントを削除しました');
+        $result = $comment->delete();
+        if ($result) {
+            return response()->json([
+                'message' => __('message.comment.delete')
+            ], Response::HTTP_OK);
+        }
     }
 }

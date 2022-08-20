@@ -52,7 +52,7 @@
                         @guest
                         @if (Route::has('login'))
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a>
+                            <a class="nav-link" href="{{ route('api.login') }}">{{ __('Login') }}</a>
                         </li>
                         @endif
 
@@ -68,7 +68,7 @@
                             </a>
 
                             <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                                <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault();
+                                <a class="dropdown-item" href="{{ route('api.logout') }}" onclick="event.preventDefault();
                                                      document.getElementById('logout-form').submit();">
                                     {{ __('Logout') }}
                                 </a>
@@ -93,12 +93,12 @@
                         @include('layouts.sidebar')
                     </div>
                     <div class="col-12 col-md-8  col-lg-9">
-                        @include("layouts.error")
+                        
                         @yield('content')
                     </div>
                     @else
                     <div class="col-12 col-md-12  col-lg-12">
-                        @include("layouts.error")
+                        
                         @yield('content')
                     </div>
                     @endif

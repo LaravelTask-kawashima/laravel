@@ -11,6 +11,7 @@ class CommentRepository implements CommentRepositoryInterface
     public function getMyComments()
     {
         $userId = auth()->user()->id;
-        return Comment::where("user_id",$userId)->orderBy("created_at", "desc")->paginate(5);
+        
+        return Comment::where("user_id",$userId)->orderBy("created_at", "desc")->paginate(config('const.POSTS_PER_PAGE'));
     }
 }

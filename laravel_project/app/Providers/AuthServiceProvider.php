@@ -14,7 +14,8 @@ class AuthServiceProvider extends ServiceProvider
      */
     protected $policies = [
         "App\Models\Post" => "App\Policies\PostPolicy",
-        "App\Models\User::class"=>"App\Policies\UserPolicy::class"
+        "App\Models\User::class"=>"App\Policies\UserPolicy::class",
+        'App\Model' => 'App\Policies\ModelPolicy',
     ];
 
     /**
@@ -25,6 +26,7 @@ class AuthServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->registerPolicies();
+
 
         Gate::define("admin", function($user){
             foreach($user->roles as $role){

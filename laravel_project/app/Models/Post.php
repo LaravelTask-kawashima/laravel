@@ -29,20 +29,21 @@ class Post extends Model
         return $this->hasMany("App\Models\Comment");
     }
 
+    public function store($request)
+    {
+        $post = Post::create([
+            'user_id' => auth()->user()->id,
+            'title' => $request['title'],
+            'body' => $request['body']
+        ]);
+        return $post;
+    }
+
     public function edit($inputs, $post)
     {
         $post->title = $inputs['title'];
         $post->body = $inputs['body'];
         $post->update();
-        return true;
-    }
-
-    public function store($request)
-    {
-        $this->user_id = auth()->user()->id;
-        $this->title = $request["title"];
-        $this->body = $request["body"];
-        $this->save();
-        return true;
+        return $post;
     }
 }
